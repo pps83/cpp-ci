@@ -1,0 +1,12 @@
+.vs/
+packages/
+msvc.build/
+node_modules/
+BacktestEngineCustomVisualizer/
+*.vcxproj.user
+log.txt
+
+# ignore data folder (or any copies of it)
+/data*/
+/vs/toSymbol3-*
+/vs/Intel*VTune*Profiler*
