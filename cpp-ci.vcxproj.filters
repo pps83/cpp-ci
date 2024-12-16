@@ -21,9 +21,15 @@
     <ClCompile Include="VsSolution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VsToolsets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VsSolution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VsToolsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

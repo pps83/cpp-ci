@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="cpp-ci.cpp" />
     <ClCompile Include="VsSolution.cpp" />
+    <ClCompile Include="VsToolsets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\backtest-engine\vs\common.vcxproj">
@@ -153,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VsSolution.h" />
+    <ClInclude Include="VsToolsets.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
