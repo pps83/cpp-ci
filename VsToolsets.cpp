@@ -44,6 +44,23 @@ static std::vector<std::string> getSortedDirs(const std::string& path)
     return getCmdOutput(fmtStr("cmd /C dir /A:D /B /O:N \"%s\"", path.c_str()));
 }
 
+static std::vector<std::string> runCl(const std::string& vsPath, const char* clArgs = nullptr)
+{
+    return getCmdOutput(fmtStr("cmd /C \"%s\\Common7\\Tools\\VsDevCmd.bat\" -no_logo && cl.exe %s", vsPath.c_str(), clArgs ? clArgs : ""));
+}
+
+// Extract version string that looks like 12.34.56.789
+static std::string parseDottedVersion(const std::string& s)
+{
+    size_t start = s.find_first_of("0123456789");
+    if (start == std::string::npos)
+        return {};
+    size_t end = start;
+    while (end < s.size() && ((s[end] >= '0' && s[end] <= '9') || s[end] == '.'))
+        ++end;
+    return s.substr(start, end - start);
+}
+
 void VsToolsets::testVsToolsets()
 {
     std::vector<std::string> vsLocations = getVswhereProperties("installationPath");
@@ -65,6 +82,13 @@ void VsToolsets::testVsToolsets()
         if (vcVersions.empty())
             continue;
         vsInstall.vcVersion = vcVersions.back(); // use last (latest) vc tools
+
+        auto clOutput = runCl(vsInstall.installationPath);
+        if (clOutput.empty())
+            continue;
+        vsInstall.clVersion = parseDottedVersion(clOutput[0]);
+        if (vsInstall.clVersion.empty())
+            continue;
 
         vsInstall.vcPlatforms = getSortedDirs(fmtStr("%s\\MSBuild\\Microsoft\\VC\\%s\\Platforms", vsInstall.installationPath.c_str(), vsInstall.vcVersion.c_str()));
 

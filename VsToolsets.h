@@ -14,6 +14,7 @@ class VsToolsets
         std::string installationVersion;
 
         std::string vcVersion; // last dir in MSBuild/Microsoft/VC
+        std::string clVersion; // version reported by cl.exe (x86 build usually)
         std::vector<std::string> vcPlatforms; // dirs in MSBuild/Microsoft/%vcVersion%/v170/Platforms
         std::map<std::string, std::vector<std::string>> vcPlatformToolsets;
     };
