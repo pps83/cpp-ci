@@ -83,6 +83,10 @@ void VsToolsets::testVsToolsets()
             continue;
         vsInstall.vcVersion = vcVersions.back(); // use last (latest) vc tools
 
+        if (!readFile(fmtStr("%s\\VC\\Auxiliary\\Build\\Microsoft.VCToolsVersion.default.txt", vsInstall.installationPath.c_str()), vsInstall.vcToolsVersion))
+            continue;
+        vsInstall.vcToolsVersion = parseDottedVersion(vsInstall.vcToolsVersion);
+
         auto clOutput = runCl(vsInstall.installationPath);
         if (clOutput.empty())
             continue;
