@@ -2,14 +2,18 @@
 #include "util.h"
 #include <boost/process.hpp>
 
-static std::vector<std::string> getCmdOutput(const char* cmd)
+static std::vector<std::string> getCmdOutput(const char* cmd, bool readStderr = false)
 {
     namespace bp = boost::process;
 
     std::vector<std::string> ret;
     bp::ipstream out;
     std::error_code ec;
-    bp::child c(cmd, bp::std_out > out, ec);
+    bp::child c;
+    if (readStderr)
+        c = bp::child(cmd, bp::std_err > out, ec);
+    else
+        c = bp::child(cmd, bp::std_out > out, ec);
     if (ec)
         return ret;
     for (std::string line; std::getline(out, line);)
@@ -21,14 +25,14 @@ static std::vector<std::string> getCmdOutput(const char* cmd)
     }
     c.wait();
     auto exit_code = c.exit_code();
-    if (exit_code != 0)
+    if (exit_code != 0 && !readStderr)
         ret.clear();
     return ret;
 }
 
-static std::vector<std::string> getCmdOutput(const std::string& cmd)
+static std::vector<std::string> getCmdOutput(const std::string& cmd, bool readStderr = false)
 {
-    return getCmdOutput(cmd.c_str());
+    return getCmdOutput(cmd.c_str(), readStderr);
 }
 
 static std::vector<std::string> getVswhereProperties(const char* property)
@@ -42,11 +46,6 @@ static std::vector<std::string> getVswhereProperties(const char* property)
 static std::vector<std::string> getSortedDirs(const std::string& path)
 {
     return getCmdOutput(fmtStr("cmd /C dir /A:D /B /O:N \"%s\"", path.c_str()));
-}
-
-static std::vector<std::string> runCl(const std::string& vsPath, const char* clArgs = nullptr)
-{
-    return getCmdOutput(fmtStr("cmd /C \"%s\\Common7\\Tools\\VsDevCmd.bat\" -no_logo && cl.exe %s", vsPath.c_str(), clArgs ? clArgs : ""));
 }
 
 // Extract version string that looks like 12.34.56.789
@@ -87,7 +86,7 @@ void VsToolsets::testVsToolsets()
             continue;
         vsInstall.vcToolsVersion = parseDottedVersion(vsInstall.vcToolsVersion);
 
-        auto clOutput = runCl(vsInstall.installationPath);
+        auto clOutput = getCmdOutput(fmtStr("\"%s\\VC\\Tools\\MSVC\\%s\\bin\\Hostx86\\x86\\cl.exe\"", vsInstall.installationPath.c_str(), vsInstall.vcToolsVersion.c_str()), true);
         if (clOutput.empty())
             continue;
         vsInstall.clVersion = parseDottedVersion(clOutput[0]);
